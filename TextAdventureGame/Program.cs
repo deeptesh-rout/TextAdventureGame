@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TextAdventureGame
 {
     class Program
     {
+        static int health = 100;
+        static List<string> inventory = new List<string>();
+        static bool hasKey = false;
+
         static void Main(string[] args)
         {
             StartGame();
@@ -16,6 +21,7 @@ namespace TextAdventureGame
             Console.WriteLine("1. Take the left path.");
             Console.WriteLine("2. Take the right path.");
             Console.WriteLine("3. Stay where you are.");
+            Console.WriteLine("4. Check your inventory.");
             string choice = Console.ReadLine();
 
             if (choice == "1")
@@ -24,6 +30,8 @@ namespace TextAdventureGame
                 RightPath();
             else if (choice == "3")
                 Stay();
+            else if (choice == "4")
+                CheckInventory();
             else
                 InvalidChoice();
         }
@@ -43,8 +51,7 @@ namespace TextAdventureGame
                 string caveChoice = Console.ReadLine();
                 if (caveChoice.ToLower() == "yes")
                 {
-                    Console.WriteLine("Inside the cave, you found an ancient artifact guarded by puzzles. Solve them to claim the treasure. You win!");
-                    EndGame();
+                    CaveScenario();
                 }
                 else
                 {
@@ -54,8 +61,8 @@ namespace TextAdventureGame
             }
             else if (choice == "2")
             {
-                Console.WriteLine("You tried to fight the bear, but it was too strong. You lost.");
-                EndGame();
+                Console.WriteLine("You tried to fight the bear.");
+                BearFight();
             }
             else if (choice == "3")
             {
@@ -80,18 +87,7 @@ namespace TextAdventureGame
 
             if (choice == "1")
             {
-                Console.WriteLine("You opened the chest and found a pile of gold coins. However, a mystical guardian appears and asks you a riddle. Answer correctly to keep the gold. What has keys but can’t open locks? (type your answer)");
-                string riddleAnswer = Console.ReadLine();
-                if (riddleAnswer.ToLower() == "piano")
-                {
-                    Console.WriteLine("Correct! The guardian vanishes, and you keep the gold. You win!");
-                    EndGame();
-                }
-                else
-                {
-                    Console.WriteLine("Wrong answer. The guardian curses you, and you lose the treasure. You lost.");
-                    EndGame();
-                }
+                OpenChest();
             }
             else if (choice == "2")
             {
@@ -151,6 +147,102 @@ namespace TextAdventureGame
             }
         }
 
+        static void BearFight()
+        {
+            Console.WriteLine("The bear attacks you. You lose 30 health.");
+            health -= 30;
+
+            if (health <= 0)
+            {
+                Console.WriteLine("You succumbed to your injuries. Game over.");
+                EndGame();
+            }
+            else
+            {
+                Console.WriteLine("You managed to escape but are injured. Health: " + health);
+                Console.WriteLine("You stumble upon a healer’s hut. Do you enter? (yes/no)");
+                string healerChoice = Console.ReadLine();
+
+                if (healerChoice.ToLower() == "yes")
+                {
+                    Console.WriteLine("The healer restores your health to full. You continue your journey.");
+                    health = 100;
+                    EndGame();
+                }
+                else
+                {
+                    Console.WriteLine("You chose not to enter and eventually succumbed to your injuries. You lost.");
+                    EndGame();
+                }
+            }
+        }
+
+        static void CaveScenario()
+        {
+            Console.WriteLine("Inside the cave, you find a glowing sword and a mysterious map. Which do you take? (sword/map/both)");
+            string caveChoice = Console.ReadLine();
+
+            if (caveChoice.ToLower() == "sword")
+            {
+                inventory.Add("Sword");
+                Console.WriteLine("You took the sword. It might come in handy.");
+                EndGame();
+            }
+            else if (caveChoice.ToLower() == "map")
+            {
+                inventory.Add("Map");
+                Console.WriteLine("You took the map. It reveals a secret exit from the forest.");
+                EndGame();
+            }
+            else if (caveChoice.ToLower() == "both")
+            {
+                inventory.Add("Sword");
+                inventory.Add("Map");
+                Console.WriteLine("You took both the sword and the map. You feel well-prepared for the journey ahead.");
+                EndGame();
+            }
+            else
+            {
+                Console.WriteLine("Invalid choice. Please try again.");
+                CaveScenario();
+            }
+        }
+
+        static void OpenChest()
+        {
+            Console.WriteLine("You opened the chest and found a pile of gold coins. However, a mystical guardian appears and asks you a riddle. Answer correctly to keep the gold. What has keys but can’t open locks? (type your answer)");
+            string riddleAnswer = Console.ReadLine();
+            if (riddleAnswer.ToLower() == "piano")
+            {
+                Console.WriteLine("Correct! The guardian vanishes, and you keep the gold. You win!");
+                inventory.Add("Gold Coins");
+                EndGame();
+            }
+            else
+            {
+                Console.WriteLine("Wrong answer. The guardian curses you, and you lose the treasure. You lost.");
+                EndGame();
+            }
+        }
+
+        static void CheckInventory()
+        {
+            Console.WriteLine("Your inventory contains:");
+            if (inventory.Count == 0)
+            {
+                Console.WriteLine("Nothing yet.");
+            }
+            else
+            {
+                foreach (string item in inventory)
+                {
+                    Console.WriteLine("- " + item);
+                }
+            }
+            Console.WriteLine("Health: " + health);
+            StartGame();
+        }
+
         static void InvalidChoice()
         {
             Console.WriteLine("Invalid choice. Please try again.");
@@ -163,6 +255,8 @@ namespace TextAdventureGame
             string choice = Console.ReadLine();
             if (choice.ToLower() == "y")
             {
+                health = 100;
+                inventory.Clear();
                 StartGame();
             }
             else
